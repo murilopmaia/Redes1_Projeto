@@ -10,6 +10,7 @@ class GameServer:
         self.lock = threading.Lock()  # Controle de acesso entre threads
         self.turn = 0  # Indica de quem é a vez
         self.awaiting_message_sent = [False, False]  # Controle para "Aguarde sua vez"
+
     def clear_screen(self, conn):
         """Limpa o terminal do cliente usando escape sequences."""
         try:
@@ -31,34 +32,27 @@ class GameServer:
         symbol = self.players[player_id]['symbol']
         conn.sendall(f"Bem-vindo! Você é o jogador {symbol}\n".encode('utf-8'))
 
-        while True:
-            with self.lock:
-                if len(self.players) < 2:
-                    if not self.awaiting_message_sent[player_id]:
-                        try:
+        try:
+            while True:
+                with self.lock:
+                    if len(self.players) < 2:
+                        if not self.awaiting_message_sent[player_id]:
                             conn.sendall("Aguardando o segundo jogador se conectar...\n".encode('utf-8'))
                             self.awaiting_message_sent[player_id] = True
-                        except ConnectionResetError:
-                            print(f"Conexão com {addr} foi resetada.")
-                            return
-                    continue
-                 
-                if self.turn != player_id:
-                    if not self.awaiting_message_sent[player_id]:
-                        try:
+                        continue
+
+                    if self.turn != player_id:
+                        if not self.awaiting_message_sent[player_id]:
                             conn.sendall("Aguarde sua vez...\n".encode('utf-8'))
                             self.awaiting_message_sent[player_id] = True
-                        except ConnectionResetError:
-                            print(f"Conexão com {addr} foi resetada.")
-                            return
-                    continue
+                        continue
 
-                self.awaiting_message_sent[player_id] = False
-                self.clear_screen(conn)
-                conn.sendall(self.game.display_board().encode('utf-8'))
-                conn.sendall(f"Sua vez! jogador {symbol}, Escolha uma posição (0-6): ".encode('utf-8'))
+                    # É a vez do jogador
+                    self.awaiting_message_sent[player_id] = False
+                    self.clear_screen(conn)
+                    conn.sendall(self.game.display_board().encode('utf-8'))
+                    conn.sendall(f"Sua vez! jogador {symbol}, Escolha uma posição (0-6): ".encode('utf-8'))
 
-                try:
                     data = conn.recv(1024).decode('utf-8')
                     if not data:
                         break
@@ -66,37 +60,37 @@ class GameServer:
                     if self.game.make_move(symbol, move):
                         self.turn = 1 - self.turn
                         winner = self.game.check_winner()
-                        if winner:
-                            for player in self.players: # Enviando a mensagem para todos os jogadores
-                                try:
-                                    player['conn'].sendall(f"Fim de jogo! O vencedor é o jogador {winner}!\n".encode('utf-8'))
-                                except ConnectionResetError:
-                                    print(f"Conexão com {player['addr']} foi resetada.")
-                                    return
-                                
-                            print(self.game.display_board())
-                            print(f"Fim de jogo! O vencedor é o jogador {winner}!\n")    
-                            break
-                        elif self.game.is_full():
-                            for player in self.players:
-                                try:
-                                    player['conn'].sendall("Empate! O tabuleiro está cheio.\n".encode('utf-8'))   
-                                except ConnectionResetError:
-                                    print(f"Conexão com {player['addr']} foi resetada.")
-                                    return
-                            print(self.game.display_board())
-                            print("Empate! O tabuleiro está cheio.\n")    
-                            break
+                        if winner or self.game.is_full():
+                            self.end_game(winner)
+                            return
                     else:
-                        conn.sendall("Movimento inválido! Tente novamente. Aguarde...\n".encode('utf-8'))
+                        conn.sendall("Movimento inválido! Tente novamente.\n".encode('utf-8'))
                         time.sleep(3)
-                except (ValueError, IndexError):
-                    conn.sendall("Entrada inválida! Escolha um número entre 0 e 6. Aguarde...\n".encode('utf-8'))
-                    time.sleep(3)
-                except ConnectionResetError:
-                    return
+        except ConnectionResetError:
+            print(f"Conexão com {addr} foi resetada.")
+            return
+        finally:
+            conn.close()
+            return
+
+    def end_game(self, winner):
+        """Encerra o jogo e notifica todos os jogadores."""
+        for player in self.players:
+            try:
+                self.clear_screen(player['conn'])
+                player['conn'].sendall(self.game.display_board().encode('utf-8'))
+                if winner:
+                    player['conn'].sendall(f"Fim de jogo! O vencedor é o jogador {winner}!\n".encode('utf-8'))
+                else:
+                    player['conn'].sendall("Empate! O tabuleiro está cheio.\n".encode('utf-8'))
+            except OSError:
+                print(f"Erro ao enviar mensagem para o jogador {player['addr']}.")
+            finally:
+                player['conn'].close()
+        print("Jogo encerrado. Conexões finalizadas.")
+
             
-        conn.close()
+        
 
 def main():
     """Função principal para configurar e iniciar o servidor do jogo."""
