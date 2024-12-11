@@ -15,14 +15,13 @@ class Connect4:
     def make_move(self, player, col):
         """Faz a jogada na coluna escolhida pelo jogador."""
         if col < 0 or col >= self.cols:
-            return False, "Coluna inválida. Escolha entre 0 e {}.".format(self.cols - 1)
+            return False
 
         for row in range(self.rows - 1, -1, -1):  # Começa de baixo para cima
             if self.board[row][col] == ' ':
                 self.board[row][col] = player
-                return True, None
-
-        return False, "Coluna cheia. Escolha outra."
+                return True
+        return False
 
     def check_winner(self):
         """Verifica se há um vencedor."""

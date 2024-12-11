@@ -16,7 +16,7 @@ def main():
                 inp = input()
                 s.sendall(inp.encode('utf-8'))
 
-            if "venceu" in data or "Empate" in data:
+            if "Fim" in data or "Empate" in data:
                 break
 
 if __name__ == "__main__":
