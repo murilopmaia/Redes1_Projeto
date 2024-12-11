@@ -10,6 +10,7 @@ class Connect4:
         for row in self.board:
             display += " | ".join(row) + "\n"
             display += "-" * (4 * self.cols - 1) + "\n"
+        display += "0   1   2   3   4   5   6\n"
         return display
 
     def make_move(self, player, col):
