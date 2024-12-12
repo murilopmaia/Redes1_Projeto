@@ -43,6 +43,8 @@ class GameServer:
 
                     if self.turn != player_id:
                         if not self.awaiting_message_sent[player_id]:
+                            self.clear_screen(conn)
+                            conn.sendall(self.game.display_board().encode('utf-8'))
                             conn.sendall("Aguarde sua vez...\n".encode('utf-8'))
                             self.awaiting_message_sent[player_id] = True
                         continue
