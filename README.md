@@ -2,13 +2,13 @@
 
 ## Propósito do Software
 
-O software implementa o jogo **Connect 4** em um formato multiplayer, onde dois jogadores se conectam ao servidor para competir. O servidor gerencia o estado do jogo, valida as jogadas e fornece feedback em tempo real aos jogadores. Cada jogador tenta alinhar quatro fichas consecutivas em uma grade 7x6, seja horizontalmente, verticalmente ou diagonalmente.
+O software implementa o jogo **Connect 4**, onde dois jogadores se conectam ao servidor para competir. O servidor gerencia o estado do jogo, valida as jogadas e fornece feedback em tempo real aos jogadores. Cada jogador tenta alinhar quatro fichas consecutivas em uma grade 7x6, seja na horizontal, vertical ou diagonal.
 
 ---
 
 ## Motivação da Escolha do Protocolo de Transporte
 
-O protocolo de transporte utilizado é o **TCP** (Transmission Control Protocol). Essa escolha foi feita devido à necessidade de uma comunicação confiável, sequencial e sem perda de mensagens. O TCP garante que todos os eventos do jogo sejam entregues e processados na ordem correta, mantendo a integridade e a sincronização entre o servidor e os clientes.
+O protocolo de transporte utilizado é o **TCP** (Transmission Control Protocol). Essa escolha foi feita devido à necessidade de uma comunicação confiável, sequencial e sem perda de mensagens.
 
 ---
 
@@ -40,7 +40,7 @@ O protocolo de transporte utilizado é o **TCP** (Transmission Control Protocol)
      | ---- Receber status ----|<--- Jogada enviada --|
 ```
 
-O diagrama acima mostra a troca de mensagens entre os clientes (jogador1.py e jogador2.py) e o servidor (servidor.py). O servidor processa cada jogada usando a lógica de `connect_4.py`, atualiza o estado do jogo e transmite a informação para os jogadores. O fluxo de mensagens garante que ambos os clientes estejam sincronizados com o estado atual do jogo.
+O diagrama acima mostra a troca de mensagens entre os clientes (jogador1.py e jogador2.py) e o servidor (servidor.py). O servidor processa cada jogada, atualiza o estado do jogo e transmite a informação para os jogadores. O fluxo de mensagens garante que ambos os clientes estejam sincronizados com o estado atual do jogo.
 
 
 ---
