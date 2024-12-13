@@ -58,7 +58,13 @@ class GameServer:
                     data = conn.recv(1024).decode('utf-8')
                     if not data:
                         break
-                    move = int(data.strip())
+                    try:
+                        move = int(data.strip())
+                    except:
+                        conn.sendall("Movimento inválido! Tente novamente.\n".encode('utf-8'))
+                        time.sleep(3)
+                        continue
+                    
                     if self.game.make_move(symbol, move):
                         self.turn = 1 - self.turn
                         winner = self.game.check_winner()
