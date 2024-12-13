@@ -2,7 +2,7 @@
 
 ## Propósito do Software
 
-O software implementa o jogo **Connect 4**, onde dois jogadores se conectam ao servidor para competir. O servidor gerencia o estado do jogo, valida as jogadas e fornece feedback em tempo real aos jogadores. Cada jogador tenta alinhar quatro fichas consecutivas em uma grade 7x6, seja horizontal, vertical ou diagonal.
+O software implementa o jogo **Connect 4**, onde dois jogadores se conectam ao servidor para competir. O servidor gerencia o estado do jogo, valida as jogadas e fornece feedback em tempo real aos jogadores. Cada jogador tenta alinhar quatro fichas consecutivas em uma grade 7x6, seja na horizontal, vertical ou diagonal.
 
 ---
 
